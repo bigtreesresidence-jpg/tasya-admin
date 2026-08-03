@@ -4,16 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasya Admin Material</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SISTEM PROTEKSI PASSWORD - Memblokir sebelum halaman dimuat -->
     <script>
-        // SISTEM PASSWORD (Wajib ada di paling atas)
-        const password = "tasya123"; 
-        const input = prompt("Masukkan Password untuk mengakses:");
-        if (input !== password) {
-            document.write("<div style='text-align:center; margin-top:100px; font-family:sans-serif;'><h1>Akses Ditolak!</h1><p>Password salah, silakan refresh halaman untuk mencoba lagi.</p></div>");
-            throw new Error("Akses Ditolak");
-        }
+        (function() {
+            const passwordBenar = "tasya123"; // Ganti password Anda di sini
+            let inputPassword = prompt("Akses Terkunci! Masukkan Password untuk membuka:");
+            
+            if (inputPassword !== passwordBenar) {
+                document.write(`
+                    <div style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f1f5f9; margin: 0; text-align: center;">
+                        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 400px; width: 90%;">
+                            <h2 style="color: #ef4444; margin-bottom: 0.5rem; font-size: 1.5rem;">Akses Ditolak!</h2>
+                            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">Password yang Anda masukkan salah atau dibatalkan.</p>
+                            <button onclick="location.reload()" style="background-color: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Coba Lagi</button>
+                        </div>
+                    </div>
+                `);
+                window.stop(); // Hentikan muat halaman sepenuhnya
+                throw new Error("Password salah! Akses ditolak.");
+            }
+        })();
     </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .nav-item.active { background-color: #0f172a; border-left: 4px solid #3b82f6; color: #ffffff; }
@@ -21,7 +37,6 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-slate-900 text-gray-300 flex flex-col hidden lg:flex">
         <div class="p-6 text-white font-bold text-lg border-b border-slate-800">Tasya Admin Material</div>
         <nav class="flex-1 p-4 space-y-2">
@@ -31,7 +46,6 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 p-8 overflow-y-auto">
         <!-- Dashboard -->
         <div id="view-dashboard">
