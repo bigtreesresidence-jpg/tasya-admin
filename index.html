@@ -2,13 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasya Admin Material</title>
-
     <!-- SISTEM PROTEKSI PASSWORD - Memblokir sebelum halaman dimuat -->
     <script>
         (function() {
-            const passwordBenar = "tasya123"; // Ganti password Anda di sini
+            const passwordBenar = "tasya123"; // Password Anda
             let inputPassword = prompt("Akses Terkunci! Masukkan Password untuk membuka:");
             
             if (inputPassword !== passwordBenar) {
@@ -21,120 +18,32 @@
                         </div>
                     </div>
                 `);
-                window.stop(); // Hentikan muat halaman sepenuhnya
-                throw new Error("Password salah! Akses ditolak.");
+                window.stop();
+                throw new Error("Akses ditolak");
             }
         })();
     </script>
 
+    <!-- ... existing code ... -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Admin Keuangan</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .nav-item.active { background-color: #0f172a; border-left: 4px solid #3b82f6; color: #ffffff; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .nav-item.active { background-color: #1e293b; border-left: 4px solid #3b82f6; color: #ffffff; }
+        .nav-item { border-left: 4px solid transparent; }
+        /* ... sisa style lama Anda ... */
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
-
-    <aside id="sidebar" class="w-64 bg-slate-900 text-gray-300 flex flex-col hidden lg:flex">
-        <div class="p-6 text-white font-bold text-lg border-b border-slate-800">Tasya Admin Material</div>
-        <nav class="flex-1 p-4 space-y-2">
-            <button onclick="showView('dashboard')" class="w-full text-left p-3 rounded hover:bg-slate-800 transition">Dashboard</button>
-            <button onclick="showView('input')" class="w-full text-left p-3 rounded hover:bg-slate-800 transition">Input Penjualan/Stok</button>
-            <button onclick="showView('laporan')" class="w-full text-left p-3 rounded hover:bg-slate-800 transition">Laporan Transaksi</button>
-        </nav>
-    </aside>
-
-    <main class="flex-1 p-8 overflow-y-auto">
-        <!-- Dashboard -->
-        <div id="view-dashboard">
-            <h1 class="text-2xl font-bold mb-6">Dashboard Agustus 2026</h1>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow-sm border">Total Kas: <br><span id="total-kas" class="text-xl font-bold">Rp 0</span></div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border">Pemasukan: <br><span id="total-in" class="text-green-600 text-xl font-bold">Rp 0</span></div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border">Pengeluaran: <br><span id="total-out" class="text-red-600 text-xl font-bold">Rp 0</span></div>
-            </div>
-        </div>
-
-        <!-- Input -->
-        <div id="view-input" class="hidden">
-            <h1 class="text-2xl font-bold mb-6">Input Transaksi Material</h1>
-            <form id="transaksi-form" class="bg-white p-6 rounded-lg shadow-sm border space-y-4 max-w-lg">
-                <input type="date" id="tgl" class="w-full p-2 border rounded" required>
-                <select id="jenis" class="w-full p-2 border rounded">
-                    <option value="Masuk">Penjualan Material (Masuk)</option>
-                    <option value="Keluar">Biaya Operasional / Kulakan (Keluar)</option>
-                </select>
-                <input type="text" id="material" placeholder="Nama Material (Contoh: Semen, Pasir, Cat)" class="w-full p-2 border rounded" required>
-                <input type="number" id="nominal" placeholder="Nominal Rp" class="w-full p-2 border rounded" required>
-                <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan Transaksi</button>
-            </form>
-        </div>
-
-        <!-- Laporan -->
-        <div id="view-laporan" class="hidden">
-            <h1 class="text-2xl font-bold mb-4">Laporan Transaksi</h1>
-            <button onclick="exportCSV()" class="bg-green-600 text-white px-4 py-2 rounded mb-4 hover:bg-green-700">Download CSV (Google Sheets)</button>
-            <div class="overflow-x-auto">
-                <table class="w-full bg-white rounded shadow-sm border">
-                    <thead><tr class="bg-slate-100 text-left"><th class="p-3">Tgl</th><th class="p-3">Material</th><th class="p-3">Jenis</th><th class="p-3">Nominal</th></tr></thead>
-                    <tbody id="laporan-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        let data = JSON.parse(localStorage.getItem('data_material_tasya')) || [];
-
-        function showView(view) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-input').classList.add('hidden');
-            document.getElementById('view-laporan').classList.add('hidden');
-            document.getElementById('view-' + view).classList.remove('hidden');
-            if(view === 'laporan') updateTable();
-            if(view === 'dashboard') updateDashboard();
-        }
-
-        document.getElementById('transaksi-form').onsubmit = function(e) {
-            e.preventDefault();
-            data.push({
-                tgl: document.getElementById('tgl').value,
-                jenis: document.getElementById('jenis').value,
-                material: document.getElementById('material').value,
-                nom: parseInt(document.getElementById('nominal').value)
-            });
-            localStorage.setItem('data_material_tasya', JSON.stringify(data));
-            alert('Transaksi material tersimpan!');
-            this.reset();
-            updateDashboard();
-        };
-
-        function updateTable() {
-            const body = document.getElementById('laporan-body');
-            body.innerHTML = data.map(d => `<tr><td class="p-3 border-t">${d.tgl}</td><td class="p-3 border-t">${d.material}</td><td class="p-3 border-t">${d.jenis}</td><td class="p-3 border-t">Rp ${d.nom.toLocaleString()}</td></tr>`).join('');
-        }
-
-        function exportCSV() {
-            let csv = "Tanggal,Material,Jenis,Nominal\n" + data.map(d => `${d.tgl},${d.material},${d.jenis},${d.nom}`).join("\n");
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'Laporan_Material_Agustus_2026.csv');
-            a.click();
-        }
-
-        function updateDashboard() {
-            let masuk = data.filter(d => d.jenis === 'Masuk').reduce((a,b) => a + b.nom, 0);
-            let keluar = data.filter(d => d.jenis === 'Keluar').reduce((a,b) => a + b.nom, 0);
-            document.getElementById('total-in').innerText = 'Rp ' + masuk.toLocaleString();
-            document.getElementById('total-out').innerText = 'Rp ' + keluar.toLocaleString();
-            document.getElementById('total-kas').innerText = 'Rp ' + (masuk - keluar).toLocaleString();
-        }
-        
-        updateDashboard();
-    </script>
+<body class="flex h-screen overflow-hidden text-gray-800">
+    <!-- Konten website Anda dilanjutkan di sini... -->
+    <!-- (Pastikan semua kode di bawah ini adalah kode yang Anda kirimkan tadi) -->
+    <!-- ... existing code ... -->
 </body>
 </html>
